@@ -1,17 +1,15 @@
-import express from 'express'
-import { body } from 'express-validator'
+import { Router } from 'express'
 import APIController from '../../controllers/APIController.js'
+import {
+  checkValidationErrors,
+  validations,
+} from '../../middlewares/validationRequest.js'
 
-const router = express.Router()
+const router = Router()
 const API = new APIController()
-// Validación de datos recibidos
-const validations = [
-  body('email', 'Incorrect e-mail format').trim().isEmail().normalizeEmail(),
-  body('password', 'Incorrect password format').isLength({ min: 3 }),
-]
 
-router.post('/login', API.login)
+router.post('/register', validations, checkValidationErrors, API.register)
 
-router.post('/register', validations, API.register)
+router.post('/login', validations, checkValidationErrors, API.login)
 
 export default router
