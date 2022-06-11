@@ -1,22 +1,31 @@
 import { User } from '../models/User.js'
-import { validationResult } from 'express-validator'
 
 class APIController {
-  async login(req, res, next) {
-    res.status(200).json({ login: 'ok' })
-  }
-
   async register(req, res, next) {
-    // Validación de datos recibidos
-    const errors = validationResult(req)
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() })
-    }
-
     const { email, password } = req.body
 
-    res.status(200).json({ register: 'ok' })
+    try {
+      const userExists = await User.findOne({ email })
+
+      if (userExists) {
+        res.status(400).json({ error: 'Email is already in use' })
+        return
+      } else {
+        const hashedPwd = await User.hashPwd(password)
+        const user = new User({ email, password: hashedPwd })
+
+        // pendiente hacer cosas con jwt
+        await user.save()
+        res.status(201).json({ register: 'New user created' })
+      }
+    } catch (error) {
+      console.log('Error at saving process:', error)
+      next(error)
+    }
+  }
+
+  async login(req, res, next) {
+    res.status(200).json({ login: 'ok' })
   }
 }
 

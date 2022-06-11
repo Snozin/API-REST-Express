@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-// import bcrypt from 'bcryptjs/dist/bcrypt'
+import bcrypt from 'bcryptjs'
 
 const { Schema, model } = mongoose
 const userSchema = new Schema(
@@ -18,5 +18,10 @@ const userSchema = new Schema(
     collection: 'Users',
   }
 )
+
+// Métodos genéricos para el modelo de usuario
+userSchema.statics.hashPwd = function (plainPwd) {
+  return bcrypt.hash(plainPwd, 10)
+}
 
 export const User = model('User', userSchema)

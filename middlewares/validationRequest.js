@@ -1,7 +1,7 @@
 import { body, validationResult } from 'express-validator'
 
 export const validations = [
-  body('email', 'Incorrect e-mail format').trim().isEmail().normalizeEmail(),
+  body('email', 'Incorrect email format').trim().isEmail().normalizeEmail(),
   body('password', 'Incorrect password format').isLength({ min: 3 }),
 ]
 
