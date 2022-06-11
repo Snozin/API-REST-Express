@@ -20,7 +20,8 @@ class APIController {
       }
     } catch (error) {
       console.log('Error at saving process:', error)
-      next(error)
+      return res.status(500).json({ error })
+      // next(error)
     }
   }
 

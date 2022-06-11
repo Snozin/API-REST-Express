@@ -20,8 +20,12 @@ const userSchema = new Schema(
 )
 
 // Métodos genéricos para el modelo de usuario
-userSchema.statics.hashPwd = function (plainPwd) {
-  return bcrypt.hash(plainPwd, 10)
+userSchema.statics.hashPwd = function (plainTextPwd) {
+  return bcrypt.hash(plainTextPwd, 10)
+}
+
+userSchema.methods.comparePassword = function (plainTextPwd) {
+  return bcrypt.compare(plainTextPwd, this.password)
 }
 
 export const User = model('User', userSchema)
