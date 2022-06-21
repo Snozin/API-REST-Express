@@ -1,5 +1,5 @@
 import { User } from '../models/User.js'
-import { generateToken } from '../utils/tokenManager.js'
+import { generateToken, generateRefreshToken } from '../utils/tokenManager.js'
 
 class APIController {
   async register(req, res, next) {
@@ -33,23 +33,29 @@ class APIController {
       const user = await User.findOne({ email })
 
       if (!user || !(await user.comparePassword(password))) {
-        res.status(400).json({ error: 'User not found or incorrect password' })
+        return res
+          .status(400)
+          .json({ error: 'User not found or incorrect password' })
       }
 
-      const { token } = generateToken(user._id)
+      const { token, expiresIn } = generateToken(user._id)
 
-      res.status(200).json({ token })
+      generateRefreshToken(user._id, res)
+
+      res.status(200).json({ token, expiresIn })
     } catch (error) {
       console.error('Login process error:', error)
-      return res.status(500).json({ error })
+      res.status(500).json({ error })
+      return
     }
   }
 
   async info(req, res) {
     try {
-      const user = await User.findById(req.uid)
+      const { uid, token, expiresIn } = req.data
+      const user = await User.findById(uid)
 
-      res.json({ id: user._id, email: user.email })
+      res.json({ id: user._id, email: user.email, token, expiresIn })
     } catch (error) {
       return res.status(500).json({ error })
     }
